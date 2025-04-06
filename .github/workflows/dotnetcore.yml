@@ -1,9 +1,10 @@
-name: Build and Publish Docker Image in Github Registry
+name: CI/CD Pipeline with Conditional Stages
 
 on:
   push:
     branches:
       - main
+      - develop
       
   pull_request:
     branches:
@@ -13,26 +14,57 @@ on:
   workflow_dispatch:
 
 jobs:
-  publish:
+  # Build and Publish Docker Image (Triggered for Pushes to main/develop)
+  build-and-publish:
     runs-on: ubuntu-latest
-
     steps:
-    # Step 1: Checkout the code
-    - name: Checkout code
-      uses: actions/checkout@v3
+      # Step 1: Checkout the code
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-    # Step 2: Convert GitHub Actor to Lowercase
-    - name: Convert GitHub Actor to Lowercase
-      run: echo "actor=$(echo ${{ github.actor }} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
+      # Step 2: Convert GitHub Actor to Lowercase
+      - name: Convert GitHub Actor to Lowercase
+        run: echo "actor=$(echo ${{ github.actor }} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
 
-    # Step 3: Log in to GitHub Container Registry
-    - name: Log in to GitHub Container Registry
-      run: docker login ghcr.io -u ${{ env.actor }} --password ${{ secrets.TOKEN }}
+      # Step 3: Log in to GitHub Container Registry
+      - name: Log in to GitHub Container Registry
+        run: docker login ghcr.io -u ${{ env.actor }} --password ${{ secrets.TOKEN }}
 
-    # Step 4: Build Docker image
-    - name: Build Docker image
-      run: docker build -t ghcr.io/${{ env.actor }}/learning-github-container-registry-api:latest .
+      # Step 4: Build Docker image
+      - name: Build Docker image
+        if: github.event_name != 'pull_request'
+        run: docker build -t ghcr.io/${{ env.actor }}/learning-github-container-registry-api:latest .
 
-    # Step 5: Push Docker image to GitHub Container Registry
-    - name: Push Docker image
-      run: docker push ghcr.io/${{ env.actor }}/learning-github-container-registry-api:latest
+      # Step 5: Push Docker image to GitHub Container Registry
+      - name: Push Docker image
+        if: github.event_name != 'pull_request'
+        run: docker push ghcr.io/${{ env.actor }}/learning-github-container-registry-api:latest
+
+  # Deploy to Development Environment (Triggered on Push to develop)
+  deploy-dev:
+    runs-on: ubuntu-latest
+    needs: build-and-publish
+    if: github.event_name != 'pull_request' && github.ref_name == 'develop'
+    steps:
+      - name: Deploy to Development Environment
+        run: echo 'Deploying to development environment...'
+
+  # Deploy to Test Environment (Triggered on Push to main)
+  deploy-test:
+    runs-on: ubuntu-latest
+    needs: build-and-publish
+    if: github.event_name != 'pull_request' && github.ref_name == 'main'
+    environment: test
+    steps:
+      - name: Deploy to Test Environment
+        run: echo 'Deploying to test environment...'
+
+  # Deploy to Production Environment (Triggered after Test Deployment)
+  deploy-prod:
+    runs-on: ubuntu-latest
+    needs: deploy-test
+    if: github.event_name != 'pull_request'
+    environment: prod
+    steps:
+      - name: Deploy to Production Environment
+        run: echo 'Deploying to production environment...'
