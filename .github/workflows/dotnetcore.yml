@@ -54,12 +54,18 @@ jobs:
     runs-on: ubuntu-latest
     needs: build-and-publish
     if: github.ref_name == 'main'
+    environment:
+      name: test
+      reviewers:
+        - RamadossE2313
     steps:
-      # Manual Approval (Requires Permissions in the UI)
-      - name: Wait for Approval
-        uses: actions/manual-approval@v1
-        with:
-          approvers: 'team-lead, qa-team'
+      # # Manual Approval (Requires Permissions in the UI)
+      # - name: Wait for Approval
+      #   uses: actions/manual-approval@v1
+      #   with:
+      #     # I have mentioned here username for the github, but we can mention teams(github team) name also below is the example for with group name
+      #     # approvers: 'contributor, admin'
+      #     approvers: 'RamadossE2313'
 
       - name: Deploy to Test Environment
         run: echo 'Deploying to test environment...'
@@ -68,12 +74,17 @@ jobs:
   deploy-prod:
     runs-on: ubuntu-latest
     needs: deploy-test
+    environment:
+      name: prod
+      reviewers:
+        - RamadossE2313
     steps:
-      # Manual Approval (Requires Permissions in the UI)
-      - name: Wait for Approval
-        uses: actions/manual-approval@v1
-        with:
-          approvers: 'team-lead, qa-team'
-      
+      # # Manual Approval (Requires Permissions in the UI)
+      # - name: Wait for Approval
+      #   uses: actions/manual-approval@v1
+      #   with:
+      #     # I have mentioned here username for the github, but we can mention teams(github team) name also below is the example for with group name
+      #     # approvers: 'contributor, admin'
+      #     approvers: 'RamadossE2313'
       - name: Deploy to Production Environment
         run: echo 'Deploying to production environment...'
