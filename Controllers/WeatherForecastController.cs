@@ -6,7 +6,6 @@ namespace LearningGithubContainerRegistry.Controllers
     [Route("[controller]")]
     public class WeatherForecastController : ControllerBase
     {
-        // add comments
         private static readonly string[] Summaries = new[]
         {
             "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
@@ -14,7 +13,6 @@ namespace LearningGithubContainerRegistry.Controllers
 
         private readonly ILogger<WeatherForecastController> _logger;
 
-        // add new comments
         public WeatherForecastController(ILogger<WeatherForecastController> logger)
         {
             _logger = logger;
@@ -30,6 +28,20 @@ namespace LearningGithubContainerRegistry.Controllers
                 Summary = Summaries[Random.Shared.Next(Summaries.Length)]
             })
             .ToArray();
+        }
+
+        [HttpGet("custom-messages", Name = "GetCustomMessages")]
+        public IEnumerable<string> GetCustomMessages()
+        {
+            // Return a list of custom messages
+            return new[]
+            {
+                "Hello, welcome to the API!",
+                "Here’s your custom message.",
+                "Stay awesome!",
+                "Keep up the great work!",
+                "API responses made simple."
+            };
         }
     }
 }
