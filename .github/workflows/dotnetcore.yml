@@ -61,7 +61,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Call Deployment Workflow for Dev
-        uses: .github/workflows/deployment.yml
+        uses: ./.github/workflows/deployment.yml
         with:
           env: dev
           build_version: ${{ env.BUILD_VERSION }}
@@ -78,7 +78,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Call Deployment Workflow for Test
-        uses: .github/workflows/deployment.yml
+        uses: ./.github/workflows/deployment.yml
         with:
           env: test
           build_version: ${{ env.BUILD_VERSION }}
@@ -95,7 +95,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Call Deployment Workflow for Prod
-        uses: .github/workflows/deployment.yml
+        uses: ./.github/workflows/deployment.yml
         with:
           env: prod
           build_version: ${{ env.BUILD_VERSION }}
