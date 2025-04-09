@@ -55,76 +55,48 @@ jobs:
 
   # Deploy to Development Environment
   deploy-dev:
-    runs-on: ubuntu-latest
+    uses: ./.github/workflows/deploy.yml
     needs: build-and-publish
     if: github.event_name != 'pull_request' && github.ref_name == 'develop'
-    environment: dev
-    steps:
-      - name: Display Environment Info
-        run: echo "Deploying to dev - ${{ needs.build-and-publish.outputs.build_version }} environment..."
-
-      - name: Log in to Azure
-        uses: azure/login@v1
-        with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
-
-      - name: Set Azure Subscription
-        run: az account set --subscription ${{ secrets.AZURE_SUBSCRIPTION }}
-
-      - name: Update Azure Container App
-        run: |
-          az containerapp update \
-          --name ${{ secrets.CONTAINER_APP }} \
-          --resource-group ${{ secrets.RESOURCE_GROUP }} \
-          --image ghcr.io/ramadosse2313/learning-github-container-registry-api:${{ needs.build-and-publish.outputs.build_version }} \
-          --set registries="ghcr.io=${{ secrets.GHCR_USERNAME }}=${{ secrets.TOKEN }}"
-
+    with:
+      environment: dev
+      build_version: ${{ needs.build-and-publish.outputs.build_version }}
+    secrets:
+      AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
+      AZURE_SUBSCRIPTION: ${{ secrets.AZURE_SUBSCRIPTION }}
+      CONTAINER_APP: ${{ secrets.CONTAINER_APP }}
+      RESOURCE_GROUP: ${{ secrets.RESOURCE_GROUP }}
+      GHCR_USERNAME: ${{ secrets.GHCR_USERNAME }}
+      TOKEN: ${{ secrets.TOKEN }}
+  
+  # Deploy to test Environment
   deploy-test:
-    runs-on: ubuntu-latest
+    uses: ./.github/workflows/deploy.yml
     needs: build-and-publish
     if: github.event_name != 'pull_request' && github.ref_name == 'main'
-    environment: test
-    steps:
-      - name: Display Environment Info
-        run: echo "Deploying to test - ${{ needs.build-and-publish.outputs.build_version }} environment..."
+    with:
+      environment: test
+      build_version: ${{ needs.build-and-publish.outputs.build_version }}
+    secrets:
+      AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
+      AZURE_SUBSCRIPTION: ${{ secrets.AZURE_SUBSCRIPTION }}
+      CONTAINER_APP: ${{ secrets.CONTAINER_APP }}
+      RESOURCE_GROUP: ${{ secrets.RESOURCE_GROUP }}
+      GHCR_USERNAME: ${{ secrets.GHCR_USERNAME }}
+      TOKEN: ${{ secrets.TOKEN }}
 
-      - name: Log in to Azure
-        uses: azure/login@v1
-        with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
-
-      - name: Set Azure Subscription
-        run: az account set --subscription ${{ secrets.AZURE_SUBSCRIPTION }}
-
-      - name: Update Azure Container App
-        run: |
-          az containerapp update \
-          --name ${{ secrets.CONTAINER_APP }} \
-          --resource-group ${{ secrets.RESOURCE_GROUP }} \
-          --image ghcr.io/ramadosse2313/learning-github-container-registry-api:${{ needs.build-and-publish.outputs.build_version }} \
-          --set registries="ghcr.io=${{ secrets.GHCR_USERNAME }}=${{ secrets.TOKEN }}"
-
+  # Deploy to prod Environment      
   deploy-prod:
-    runs-on: ubuntu-latest
+    uses: ./.github/workflows/deploy.yml
     needs: deploy-test
     if: github.event_name != 'pull_request'
-    environment: prod
-    steps:
-      - name: Display Environment Info
-        run: echo "Deploying to test - ${{ needs.build-and-publish.outputs.build_version }} environment..."
-
-      - name: Log in to Azure
-        uses: azure/login@v1
-        with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
-
-      - name: Set Azure Subscription
-        run: az account set --subscription ${{ secrets.AZURE_SUBSCRIPTION }}
-
-      - name: Update Azure Container App
-        run: |
-          az containerapp update \
-          --name ${{ secrets.CONTAINER_APP }} \
-          --resource-group ${{ secrets.RESOURCE_GROUP }} \
-          --image ghcr.io/ramadosse2313/learning-github-container-registry-api:${{ needs.build-and-publish.outputs.build_version }} \
-          --set registries="ghcr.io=${{ secrets.GHCR_USERNAME }}=${{ secrets.TOKEN }}"
+    with:
+      environment: prod
+      build_version: ${{ needs.build-and-publish.outputs.build_version }}
+    secrets:
+      AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
+      AZURE_SUBSCRIPTION: ${{ secrets.AZURE_SUBSCRIPTION }}
+      CONTAINER_APP: ${{ secrets.CONTAINER_APP }}
+      RESOURCE_GROUP: ${{ secrets.RESOURCE_GROUP }}
+      GHCR_USERNAME: ${{ secrets.GHCR_USERNAME }}
+      TOKEN: ${{ secrets.TOKEN }}
