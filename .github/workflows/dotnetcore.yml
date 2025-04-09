@@ -56,6 +56,8 @@ jobs:
     needs: build-and-publish
     if: github.event_name != 'pull_request' && github.ref_name == 'develop'
     environment: dev
+    env:
+      BUILD_VERSION: ${{ needs.build-and-publish.outputs.build_version }}
     steps:
       - name: Display Environment Info
         run: echo "Deploying to ${{ github.environment }} environment..."
