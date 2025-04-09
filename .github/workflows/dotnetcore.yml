@@ -60,7 +60,7 @@ jobs:
       BUILD_VERSION: ${{ needs.build-and-publish.outputs.build_version }}
     steps:
       - name: Display Environment Info
-        run: echo "Deploying to ${{ github.environment }} environment..."
+        run: echo "Deploying to ${{ github.environment }} - ${{env.BUILD_VERSION}} environment..."
 
       - name: Log in to Azure
         uses: azure/login@v1
