@@ -1,4 +1,4 @@
-name: Deploy Container App
+name: Reusable Deploy
 
 on:
   workflow_call:
@@ -26,10 +26,9 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    environment: ${{ inputs.environment }}
     steps:
-      - name: Display Environment Info
-        run: echo "Deploying to ${{ inputs.environment }} - ${{ inputs.build_version }} environment..."
+      - name: Checkout code
+        uses: actions/checkout@v3
 
       - name: Log in to Azure
         uses: azure/login@v1
@@ -39,10 +38,11 @@ jobs:
       - name: Set Azure Subscription
         run: az account set --subscription ${{ secrets.AZURE_SUBSCRIPTION }}
 
-      - name: Update Azure Container App
+      - name: Deploy to Azure Container App
         run: |
+          echo "Deploying to ${{ inputs.environment }} environment..."
           az containerapp update \
-          --name ${{ secrets.CONTAINER_APP }} \
-          --resource-group ${{ secrets.RESOURCE_GROUP }} \
-          --image ghcr.io/ramadosse2313/learning-github-container-registry-api:${{ inputs.build_version }} \
-          --set registries="ghcr.io=${{ secrets.GHCR_USERNAME }}=${{ secrets.TOKEN }}"
+            --name ${{ secrets.CONTAINER_APP }} \
+            --resource-group ${{ secrets.RESOURCE_GROUP }} \
+            --image ghcr.io/ramadosse2313/learning-github-container-registry-api:${{ inputs.build_version }} \
+            --set registries="ghcr.io=${{ secrets.GHCR_USERNAME }}=${{ secrets.TOKEN }}"
