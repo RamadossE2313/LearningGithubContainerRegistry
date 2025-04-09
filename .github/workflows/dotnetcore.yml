@@ -75,7 +75,7 @@ jobs:
           az containerapp update \
             --name ${{ secrets.CONTAINER_APP }} \
             --resource-group ${{ secrets.RESOURCE_GROUP }} \
-            --image ghcr.io/ramadosse2313/learning-github-container-registry-api:20250409170409 \
+            --image ghcr.io/ramadosse2313/learning-github-container-registry-api:20250409171409 \
             --set registries="ghcr.io=${{ secrets.GHCR_USERNAME }}=${{ secrets.TOKEN }}"
 
   # Deploy to Test Environment
