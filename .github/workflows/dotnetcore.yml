@@ -1,4 +1,4 @@
-name: CI/CD Pipeline with MultiStage and Approvers
+name: Build and Deploy
 
 on:
   push:
