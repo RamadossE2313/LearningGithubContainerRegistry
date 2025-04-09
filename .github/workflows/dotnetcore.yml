@@ -1,4 +1,4 @@
-name: CI/CD Pipeline with MultiStage with Approvers
+name: CI/CD Pipeline with MultiStage and Approvers
 
 on:
   push:
@@ -32,7 +32,7 @@ jobs:
 
       # Step 4: Log in to GitHub Container Registry
       - name: Log in to GitHub Container Registry
-        run: docker login ghcr.io -u ${{ env.actor }} --password ${{ secrets.TOKEN }}
+        run: docker login ghcr.io -u ${{ env.actor }} --password ${{ secrets.GHCR_TOKEN }}
 
       # Step 5: Build Docker image with Build Version
       - name: Build Docker image
@@ -57,27 +57,12 @@ jobs:
     if: github.event_name != 'pull_request' && github.ref_name == 'develop'
     environment: dev
     steps:
-      # Step 1: Just displaying
-      - name: Deploy to Development Environment
-        run: echo 'Deploying to development environment...'
-
-      # Step 2: Log in to Azure
-      - name: Log in to Azure
-        uses: azure/login@v1
+      - name: Call Deployment Workflow for Dev
+        uses: ./.github/workflows/deployment.yml
         with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
-
-      # Step 3: Set Azure Subscription
-      - name: Set Azure Subscription
-        run: az account set --subscription ${{ env.AZURE_SUBSCRIPTION }}
-
-      # Step 4: Update Azure Container App
-      - name: Update Azure Container App
-        run: |
-          az containerapp update \
-            --name ${{ env.CONTAINER_APP }} \
-            --resource-group ${{ env.RESOURCE_GROUP }} \
-            --image ghcr.io/${{ env.actor }}/learning-github-container-registry-api:${{ env.BUILD_VERSION }}
+          env: dev
+          build_version: ${{ env.BUILD_VERSION }}
+          actor: ${{ env.actor }}
 
   # Deploy to Test Environment
   deploy-test:
@@ -86,8 +71,12 @@ jobs:
     if: github.event_name != 'pull_request' && github.ref_name == 'main'
     environment: test
     steps:
-      - name: Deploy to Test Environment
-        run: echo 'Deploying to test environment...'
+      - name: Call Deployment Workflow for Test
+        uses: ./.github/workflows/deployment.yml
+        with:
+          env: test
+          build_version: ${{ env.BUILD_VERSION }}
+          actor: ${{ env.actor }}
 
   # Deploy to Production Environment
   deploy-prod:
@@ -96,5 +85,9 @@ jobs:
     if: github.event_name != 'pull_request'
     environment: prod
     steps:
-      - name: Deploy to Production Environment
-        run: echo 'Deploying to production environment...'
+      - name: Call Deployment Workflow for Prod
+        uses: ./.github/workflows/deployment.yml
+        with:
+          env: prod
+          build_version: ${{ env.BUILD_VERSION }}
+          actor: ${{ env.actor }}
