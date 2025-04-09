@@ -32,7 +32,7 @@ jobs:
 
       # Step 4: Log in to GitHub Container Registry
       - name: Log in to GitHub Container Registry
-        run: docker login ghcr.io -u ${{ env.actor }} --password ${{ secrets.GHCR_TOKEN }}
+        run: docker login ghcr.io -u ${{ env.actor }} --password ${{ secrets.TOKEN }}
 
       # Step 5: Build Docker image with Build Version
       - name: Build Docker image

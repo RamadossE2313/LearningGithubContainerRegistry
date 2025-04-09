@@ -35,5 +35,5 @@ jobs:
             --name ${{ secrets.CONTAINER_APP }} \
             --resource-group ${{ secrets.RESOURCE_GROUP }} \
             --image ghcr.io/${{ inputs.actor }}/learning-github-container-registry-api:${{ inputs.build_version }} \
-            --set registries="ghcr.io=${{ secrets.GHCR_USERNAME }}=${{ secrets.GHCR_TOKEN }}"
+            --set registries="ghcr.io=${{ secrets.GHCR_USERNAME }}=${{ secrets.TOKEN }}"
 
