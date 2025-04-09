@@ -14,6 +14,7 @@ namespace LearningGithubContainerRegistry.Controllers
 
         private readonly ILogger<WeatherForecastController> _logger;
 
+        // add new comments
         public WeatherForecastController(ILogger<WeatherForecastController> logger)
         {
             _logger = logger;
