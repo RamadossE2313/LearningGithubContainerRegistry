@@ -55,13 +55,6 @@ jobs:
     with:
       environment: dev
       build_version: ${{ needs.build-and-publish.outputs.build_version }}
-    secrets:
-      AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
-      AZURE_SUBSCRIPTION: ${{ secrets.AZURE_SUBSCRIPTION }}
-      CONTAINER_APP: ${{ secrets.CONTAINER_APP }}
-      RESOURCE_GROUP: ${{ secrets.RESOURCE_GROUP }}
-      GHCR_USERNAME: ${{ secrets.GHCR_USERNAME }}
-      TOKEN: ${{ secrets.TOKEN }}
 
   # ✅ Deploy to Test
   deploy-test:
@@ -71,13 +64,6 @@ jobs:
     with:
       environment: test
       build_version: ${{ needs.build-and-publish.outputs.build_version }}
-    secrets:
-      AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
-      AZURE_SUBSCRIPTION: ${{ secrets.AZURE_SUBSCRIPTION }}
-      CONTAINER_APP: ${{ secrets.CONTAINER_APP }}
-      RESOURCE_GROUP: ${{ secrets.RESOURCE_GROUP }}
-      GHCR_USERNAME: ${{ secrets.GHCR_USERNAME }}
-      TOKEN: ${{ secrets.TOKEN }}
 
   # ✅ Deploy to Production
   deploy-prod:
@@ -87,10 +73,3 @@ jobs:
     with:
       environment: prod
       build_version: ${{ needs.build-and-publish.outputs.build_version }}
-    secrets:
-      AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
-      AZURE_SUBSCRIPTION: ${{ secrets.AZURE_SUBSCRIPTION }}
-      CONTAINER_APP: ${{ secrets.CONTAINER_APP }}
-      RESOURCE_GROUP: ${{ secrets.RESOURCE_GROUP }}
-      GHCR_USERNAME: ${{ secrets.GHCR_USERNAME }}
-      TOKEN: ${{ secrets.TOKEN }}

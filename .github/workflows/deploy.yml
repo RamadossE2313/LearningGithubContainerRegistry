@@ -9,23 +9,10 @@ on:
       build_version:
         required: true
         type: string
-    secrets:
-      AZURE_CREDENTIALS:
-        required: true
-      AZURE_SUBSCRIPTION:
-        required: true
-      CONTAINER_APP:
-        required: true
-      RESOURCE_GROUP:
-        required: true
-      GHCR_USERNAME:
-        required: true
-      TOKEN:
-        required: true
-
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    environment: ${{inputs.environment}}
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
