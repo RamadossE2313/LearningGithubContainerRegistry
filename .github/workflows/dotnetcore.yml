@@ -32,7 +32,7 @@ jobs:
 
       # Step 4: Log in to GitHub Container Registry
       - name: Log in to GitHub Container Registry
-        run: docker login ghcr.io -u ${{ env.actor }} --password ${{ secrets.TOKEN }}
+        run: echo "${{ secrets.TOKEN }}" | docker login ghcr.io -u ${{ env.actor }} --password-stdin
 
       # Step 5: Build Docker image with Build Version
       - name: Build Docker image
@@ -74,8 +74,11 @@ jobs:
     if: github.event_name != 'pull_request' && github.ref_name == 'main'
     environment: test
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
       - name: Call Deployment Workflow for Test
-        uses: ./.github/workflows/deployment.yml
+        uses: .github/workflows/deployment.yml
         with:
           env: test
           build_version: ${{ env.BUILD_VERSION }}
@@ -88,8 +91,11 @@ jobs:
     if: github.event_name != 'pull_request'
     environment: prod
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
       - name: Call Deployment Workflow for Prod
-        uses: ./.github/workflows/deployment.yml
+        uses: .github/workflows/deployment.yml
         with:
           env: prod
           build_version: ${{ env.BUILD_VERSION }}
