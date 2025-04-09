@@ -17,11 +17,9 @@ jobs:
     outputs:
       build_version: ${{ steps.build_version.outputs.build_version }}
     steps:
-      # Step 1: Checkout the code
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # Step 2: Generate Build Version
       - name: Generate Build Version
         id: build_version
         run: |
@@ -29,15 +27,12 @@ jobs:
           echo "BUILD_VERSION=$BUILD_VERSION" >> $GITHUB_ENV
           echo "build_version=$BUILD_VERSION" >> $GITHUB_OUTPUT
 
-      # Step 3: Convert GitHub Actor to Lowercase
       - name: Convert GitHub Actor to Lowercase
         run: echo "actor=$(echo ${{ github.actor }} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
 
-      # Step 4: Log in to GitHub Container Registry
       - name: Log in to GitHub Container Registry
         run: echo "${{ secrets.TOKEN }}" | docker login ghcr.io -u ${{ env.actor }} --password-stdin
 
-      # Step 5: Build Docker image with Build Version
       - name: Build Docker image
         if: github.event_name != 'pull_request'
         run: |
@@ -46,18 +41,17 @@ jobs:
           -t ghcr.io/${{ env.actor }}/learning-github-container-registry-api:latest \
           .
 
-      # Step 6: Push Docker images to GitHub Container Registry
       - name: Push Docker images
         if: github.event_name != 'pull_request'
         run: |
           docker push ghcr.io/${{ env.actor }}/learning-github-container-registry-api:${{ env.BUILD_VERSION }}
           docker push ghcr.io/${{ env.actor }}/learning-github-container-registry-api:latest
 
-  # Deploy to Development Environment
+  # ✅ Deploy to Development
   deploy-dev:
-    uses: ./.github/workflows/deploy.yml
     needs: build-and-publish
     if: github.event_name != 'pull_request' && github.ref_name == 'develop'
+    uses: ./.github/workflows/deploy.yml
     with:
       environment: dev
       build_version: ${{ needs.build-and-publish.outputs.build_version }}
@@ -68,12 +62,12 @@ jobs:
       RESOURCE_GROUP: ${{ secrets.RESOURCE_GROUP }}
       GHCR_USERNAME: ${{ secrets.GHCR_USERNAME }}
       TOKEN: ${{ secrets.TOKEN }}
-  
-  # Deploy to test Environment
+
+  # ✅ Deploy to Test
   deploy-test:
-    uses: ./.github/workflows/deploy.yml
     needs: build-and-publish
     if: github.event_name != 'pull_request' && github.ref_name == 'main'
+    uses: ./.github/workflows/deploy.yml
     with:
       environment: test
       build_version: ${{ needs.build-and-publish.outputs.build_version }}
@@ -85,11 +79,11 @@ jobs:
       GHCR_USERNAME: ${{ secrets.GHCR_USERNAME }}
       TOKEN: ${{ secrets.TOKEN }}
 
-  # Deploy to prod Environment      
+  # ✅ Deploy to Production
   deploy-prod:
-    uses: ./.github/workflows/deploy.yml
     needs: deploy-test
     if: github.event_name != 'pull_request'
+    uses: ./.github/workflows/deploy.yml
     with:
       environment: prod
       build_version: ${{ needs.build-and-publish.outputs.build_version }}
